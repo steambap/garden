@@ -1,16 +1,18 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import bgioContext from "./bgio_context";
+import hudContext from "./hud_context";
 import HandPiece from "./hand_piece";
 
 const HUD = () => {
-  const { G, moves } = useContext(bgioContext)!;
+  const [rotation, setRotation] = useState(0);
+  const { G } = useContext(bgioContext)!;
   const hand = G.handPiece.slice(0, 2);
   const rotate = (dir: number) => {
-    moves.rotateHand(dir);
+    setRotation((rotation + dir) % 6);
   };
 
   return (
-    <div>
+    <hudContext.Provider value={{ rotation, setRotation }}>
       <div className="fixed left-0 bottom-0 flex">
         {hand.map((p) => {
           return <HandPiece key={p.id} p={p} />;
@@ -26,7 +28,7 @@ const HUD = () => {
           </button>
         </div>
       </div>
-    </div>
+    </hudContext.Provider>
   );
 };
 

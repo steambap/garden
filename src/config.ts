@@ -1,7 +1,7 @@
 import type { Game, Move } from "boardgame.io";
 import { INVALID_MOVE } from "boardgame.io/core";
-import { IPiece, IPlacedPiece, PieceSet, isInRange } from "./piece";
-import { hexOrigin } from "./hex";
+import { IPiece, IPlacedPiece, PieceSet, isInRange, getFruitMapping, isSameColor } from "./piece";
+import { Hex, hexOrigin } from "./hex";
 
 export interface IG {
   topPiece: IPlacedPiece[];
@@ -12,19 +12,22 @@ const addPiece: Move<IG> = ({ G }, newPiece: IPlacedPiece) => {
   if (!isInRange(newPiece, G.topPiece)) {
     return INVALID_MOVE;
   }
+  const fruitMap = getFruitMapping(G.topPiece);
+  const {position, colorList, rotation} = newPiece;
+  for (let i = 0;i < colorList.length;i++) {
+    const color = colorList[i];
+    if (color === "glade") {
+      continue;
+    }
+    const hexPos = Hex.add(position, Hex.at(i, rotation));
+    const hexStr = Hex.toStr(hexPos);
+    if (fruitMap[hexStr] && fruitMap[hexStr].color !== "glade" && !isSameColor(fruitMap[hexStr].color, color)) {
+      return INVALID_MOVE;
+    }
+  }
+
   G.handPiece = G.handPiece.filter((p) => p.id !== newPiece.id);
   G.topPiece.push(newPiece);
-};
-
-const rotateHand: Move<IG> = ({ G }, num: number) => {
-  const p1 = G.handPiece[0];
-  if (p1) {
-    p1.rotation += num;
-  }
-  const p2 = G.handPiece[1];
-  if (p2) {
-    p2.rotation += num;
-  }
 };
 
 export const gameConfig: Game<IG> = {
@@ -32,6 +35,7 @@ export const gameConfig: Game<IG> = {
     const pList = random.Shuffle(PieceSet.slice(0));
     const top = {
       ...pList[0],
+      rotation: 0,
       position: hexOrigin,
     };
 
@@ -40,7 +44,7 @@ export const gameConfig: Game<IG> = {
       handPiece: pList.slice(1, 9),
     };
   },
-  moves: { addPiece, rotateHand },
+  moves: { addPiece },
   turn: {
     minMoves: 1,
     maxMoves: 1,

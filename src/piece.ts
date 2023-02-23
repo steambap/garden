@@ -2,9 +2,12 @@ import { IHex, Hex } from "./hex";
 
 export type PieceColor = "r1" | "r2" | "y1" | "y2" | "l1" | "l2" | "glade";
 
+export function isSameColor(a: PieceColor, b:PieceColor): boolean {
+  return a.charAt(0) === b.charAt(0);
+}
+
 export interface IPiece {
   id: number;
-  rotation: number;
   colorList: PieceColor[];
 }
 
@@ -13,25 +16,100 @@ export interface IFruit {
   color: PieceColor;
 }
 
+function stack(f: IFruit, color: PieceColor): number {
+  if (!isSameColor(f.color, color)) {
+    throw new Error("cannot stack different fruit");
+  }
+  const baseNum = f.score === 0 ? Number(f.color.charAt(1)) : f.score;
+  const newScore = Number(color.charAt(1));
+  if (baseNum >= 10) {
+    return 15;
+  } else if (baseNum >= 6) {
+    return 10;
+  } else if (baseNum >= 5) {
+    return newScore === 2 ? 10 : 6;
+  } else {
+    return baseNum + newScore;
+  }
+}
+
 export interface IPlacedPiece extends IPiece {
+  rotation: number;
   position: IHex;
 }
 
 export const PieceSet: IPiece[] = [
   {
     id: 1,
-    rotation: 0,
     colorList: ["glade", "y2", "l1", "r2", "r1", "l1", "glade"],
   },
   {
     id: 2,
-    rotation: 0,
     colorList: ["r1", "l2", "glade", "l1", "y2", "r1", "glade"],
   },
   {
     id: 3,
-    rotation: 0,
     colorList: ["r2", "r1", "glade", "l2", "y1", "y1", "glade"],
+  },
+  {
+    id: 4,
+    colorList: ["y1", "glade", "y1", "l1", "r2", "l2", "glade"],
+  },
+  {
+    id: 5,
+    colorList: ["y1", "r2", "glade", "r1", "l2", "y1", "glade"],
+  },
+  {
+    id: 6,
+    colorList: ["r1", "l2", "r1", "glade", "y2", "l1", "glade"],
+  },
+  {
+    id: 7,
+    colorList: ["l1", "glade", "r2", "y2", "l1", "r1", "glade"],
+  },
+  {
+    id: 8,
+    colorList: ["l1", "y2", "glade", "y1", "r2", "l1", "glade"],
+  },
+  {
+    id: 9,
+    colorList: ["glade", "r2", "y1", "l2", "l1", "y1", "glade"],
+  },
+  {
+    id: 10,
+    colorList: ["glade", "r2", "y1", "l1", "y2", "l1", "glade"],
+  },
+  {
+    id: 11,
+    colorList: ["r2", "l1", "l1", "y2", "y1", "glade", "glade"],
+  },
+  {
+    id: 12,
+    colorList: ["r1", "y2", "r2", "l1", "glade", "l1", "glade"],
+  },
+  {
+    id: 13,
+    colorList: ["r1", "glade", "y2", "l2", "r1", "y1", "glade"],
+  },
+  {
+    id: 14,
+    colorList: ["r2", "y1", "l1", "y1", "glade", "l2", "glade"],
+  },
+  {
+    id: 15,
+    colorList: ["y1", "l2", "y2", "r1", "glade", "r1", "glade"],
+  },
+  {
+    id: 16,
+    colorList: ["y1", "r2", "y1", "glade", "l2", "r1", "glade"],
+  },
+  {
+    id: 17,
+    colorList: ["y2", "r1", "r1", "l2", "l1", "glade", "glade"],
+  },
+  {
+    id: 18,
+    colorList: ["glade", "l2", "r1", "y2", "y1", "r1", "glade"],
   },
 ];
 
@@ -77,11 +155,9 @@ export function getFruitMapping(
         const fruit = ret[hexStr];
         if (
           fruit.color !== "glade" &&
-          fruit.color.charAt(0) === color.charAt(0)
+          isSameColor(fruit.color, color)
         ) {
-          const baseNum =
-            fruit.score === 0 ? Number(fruit.color.charAt(1)) : fruit.score;
-          fruit.score += Number(color.charAt(1));
+          fruit.score = stack(fruit, color);
         } else {
           // Different fruit or glade in previous slot
           ret[hexStr] = {

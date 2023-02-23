@@ -5,6 +5,7 @@ import { IPiece, IPlacedPiece } from "./piece";
 import { getFillClass } from "./piece";
 import { Hex } from "./hex";
 import bgioContext from "./bgio_context";
+import hudContext from "./hud_context";
 
 interface props {
   p: IPiece;
@@ -12,6 +13,7 @@ interface props {
 
 const HandPiece = ({ p }: props) => {
   const { moves } = useContext(bgioContext)!;
+  const { rotation } = useContext(hudContext);
   const [{ x, y }, api] = useSpring(() => ({
     x: 0,
     y: 0,
@@ -29,6 +31,7 @@ const HandPiece = ({ p }: props) => {
           .map(Number);
         const newPiece: IPlacedPiece = {
           ...p,
+          rotation,
           position: Hex.from(data[0], data[1], data[2]),
         };
         moves.addPiece(newPiece);
@@ -48,7 +51,7 @@ const HandPiece = ({ p }: props) => {
       className="touch-none"
     >
       {p.colorList.map((color, idx) => {
-        const hexPos = Hex.at(idx, p.rotation);
+        const hexPos = Hex.at(idx, rotation);
         const corners = Hex.polygonCorners(hexPos);
         const points: string[] = [];
         const fill = getFillClass(color);
