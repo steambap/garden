@@ -2,10 +2,10 @@ import { useContext } from "react";
 import { animated, useSpring } from "@react-spring/web";
 import { useDrag } from "@use-gesture/react";
 import { IPiece, IPlacedPiece } from "./piece";
-import { getFillClass } from "./piece";
-import { Hex } from "./hex";
+import { Hex, hexOrigin } from "./hex";
 import bgioContext from "./bgio_context";
 import hudContext from "./hud_context";
+import Citrus from "./citrus";
 
 interface props {
   p: IPiece;
@@ -52,20 +52,21 @@ const HandPiece = ({ p }: props) => {
     >
       {p.colorList.map((color, idx) => {
         const hexPos = Hex.at(idx, rotation);
-        const corners = Hex.polygonCorners(hexPos);
+        const center = Hex.toPixel(hexPos);
+        const corners = Hex.polygonCorners(hexOrigin);
         const points: string[] = [];
-        const fill = getFillClass(color);
         corners.forEach((point) => {
           points.push(`${point.x},${point.y}`);
         });
 
         return (
-          <polygon
-            key={idx}
-            points={points.join(" ")}
-            className={fill}
-            stroke="black"
-          />
+          <g key={idx} transform={`translate(${center.x},${center.y})`}>
+            <polygon
+              points={points.join(" ")}
+              className="fill-transparent stroke-gray-300"
+            />
+            <Citrus color={color} />
+          </g>
         );
       })}
     </animated.svg>

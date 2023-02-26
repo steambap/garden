@@ -1,6 +1,13 @@
 import type { Game, Move } from "boardgame.io";
 import { INVALID_MOVE } from "boardgame.io/core";
-import { IPiece, IPlacedPiece, PieceSet, isInRange, getFruitMapping, isSameColor } from "./piece";
+import {
+  IPiece,
+  IPlacedPiece,
+  PieceSet,
+  isInRange,
+  getFruitMapping,
+  isSameColor,
+} from "./piece";
 import { Hex, hexOrigin } from "./hex";
 
 export interface IG {
@@ -13,15 +20,19 @@ const addPiece: Move<IG> = ({ G }, newPiece: IPlacedPiece) => {
     return INVALID_MOVE;
   }
   const fruitMap = getFruitMapping(G.topPiece);
-  const {position, colorList, rotation} = newPiece;
-  for (let i = 0;i < colorList.length;i++) {
+  const { position, colorList, rotation } = newPiece;
+  for (let i = 0; i < colorList.length; i++) {
     const color = colorList[i];
     if (color === "glade") {
       continue;
     }
     const hexPos = Hex.add(position, Hex.at(i, rotation));
     const hexStr = Hex.toStr(hexPos);
-    if (fruitMap[hexStr] && fruitMap[hexStr].color !== "glade" && !isSameColor(fruitMap[hexStr].color, color)) {
+    if (
+      fruitMap[hexStr] &&
+      fruitMap[hexStr].color !== "glade" &&
+      !isSameColor(fruitMap[hexStr].color, color)
+    ) {
       return INVALID_MOVE;
     }
   }

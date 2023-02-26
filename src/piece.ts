@@ -2,7 +2,7 @@ import { IHex, Hex } from "./hex";
 
 export type PieceColor = "r1" | "r2" | "y1" | "y2" | "l1" | "l2" | "glade";
 
-export function isSameColor(a: PieceColor, b:PieceColor): boolean {
+export function isSameColor(a: PieceColor, b: PieceColor): boolean {
   return a.charAt(0) === b.charAt(0);
 }
 
@@ -113,7 +113,20 @@ export const PieceSet: IPiece[] = [
   },
 ];
 
-// For debug
+// These two have to be repeated to not confuse tailwindcss
+export function getStrokeClass(pieceColor: PieceColor): string {
+  let cn = "stroke-gray-400";
+  if (pieceColor.charAt(0) === "r") {
+    cn = "stroke-red-400";
+  } else if (pieceColor.charAt(0) === "y") {
+    cn = "stroke-amber-400";
+  } else if (pieceColor.charAt(0) === "l") {
+    cn = "stroke-lime-400";
+  }
+
+  return cn;
+}
+
 export function getFillClass(pieceColor: PieceColor): string {
   let fill = "fill-gray-400";
   if (pieceColor.charAt(0) === "r") {
@@ -153,10 +166,7 @@ export function getFruitMapping(
 
       if (ret[hexStr]) {
         const fruit = ret[hexStr];
-        if (
-          fruit.color !== "glade" &&
-          isSameColor(fruit.color, color)
-        ) {
+        if (fruit.color !== "glade" && isSameColor(fruit.color, color)) {
           fruit.score = stack(fruit, color);
         } else {
           // Different fruit or glade in previous slot
@@ -176,4 +186,14 @@ export function getFruitMapping(
   });
 
   return ret;
+}
+
+export function getScore(pieces: IPlacedPiece[]): number {
+  const fruitMap = getFruitMapping(pieces);
+  let score = 0;
+  Object.values(fruitMap).forEach((fruit) => {
+    score += fruit.score;
+  });
+
+  return score;
 }

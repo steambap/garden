@@ -18,9 +18,16 @@
   -webkit-text-size-adjust: 100%;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+@layer components {
+  .button {
+    @apply bg-sky-700 rounded border border-amber-400 outline outline-slate-700 text-white disabled:border-slate-400 disabled:text-slate-300;
   }
+}
+
+.victory {
+  background-color: rgba(36, 36, 36, 0.3);
+}
+
+dialog::backdrop {
+  background: rgba(224, 228, 232, .9);
 }

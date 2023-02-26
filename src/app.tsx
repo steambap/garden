@@ -26,6 +26,7 @@ function App() {
       client.current = RawClient({
         game: gameConfig,
         numPlayers: 1,
+        debug: false,
       });
     }
     const unsubscribe = client.current.subscribe(() => forceUpdate());

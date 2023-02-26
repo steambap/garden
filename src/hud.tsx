@@ -1,15 +1,17 @@
 import { useContext, useState } from "react";
+import { getScore } from "./piece";
 import bgioContext from "./bgio_context";
 import hudContext from "./hud_context";
 import HandPiece from "./hand_piece";
 
 const HUD = () => {
   const [rotation, setRotation] = useState(0);
-  const { G } = useContext(bgioContext)!;
+  const { G, ctx, reset } = useContext(bgioContext)!;
   const hand = G.handPiece.slice(0, 2);
   const rotate = (dir: number) => {
     setRotation((rotation + dir) % 6);
   };
+  const score = getScore(G.topPiece);
 
   return (
     <hudContext.Provider value={{ rotation, setRotation }}>
@@ -28,6 +30,16 @@ const HUD = () => {
           </button>
         </div>
       </div>
+      {ctx.gameover && (
+        <div className="fixed left-0 right-0 top-0 bottom-0 flex items-center justify-center victory">
+          <div className="text-center text-white rounded p-4 bg-gray-600">
+            <div>{`Score: ${score}`}</div>
+            <div className="mt-2">
+              <button className="button px-4 py-0.5" onClick={() => reset()}>Restart</button>
+            </div>
+          </div>
+        </div>
+      )}
     </hudContext.Provider>
   );
 };

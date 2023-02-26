@@ -1,9 +1,10 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext } from "react";
 import { useDrag } from "@use-gesture/react";
 import { animated, useSpring } from "@react-spring/web";
 import bgioContext from "./bgio_context";
-import { getFillClass, getFruitMapping } from "./piece";
-import { Hex, hexMap } from "./hex";
+import { getFruitMapping, getFillClass, getStrokeClass, IFruit } from "./piece";
+import { Hex, hexMap, hexOrigin } from "./hex";
+import Citrus from "./citrus";
 
 const innerWidth = window.innerWidth;
 const innerHeight = window.innerHeight;
@@ -21,37 +22,67 @@ const Board = () => {
   const fruitMap = getFruitMapping(G.topPiece);
 
   return (
-    <div className="h-screen overflow-hidden">
-      <animated.div
-        className="touch-none p-8 relative"
+    <div className="h-screen overflow-hidden bg-stone-600">
+      <svg
+        className="w-full h-full touch-none"
+        xmlns="http://www.w3.org/2000/svg"
         {...bind()}
-        style={{ x, y }}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-480 -480 960 960" width="960" height="960">
+        <animated.g style={{ x, y }}>
           {hexMap.map((hex) => {
-            const corners = Hex.polygonCorners(hex);
+            const center = Hex.toPixel(hex);
+            const translateX = center.x + innerWidth * 0.5;
+            const translateY = center.y + innerHeight * 0.5 - 200;
+            const corners = Hex.polygonCorners(hexOrigin);
             const points: string[] = [];
             corners.forEach((point) => {
               points.push(`${point.x},${point.y}`);
             });
-            let fill = "fill-transparent";
-            if (fruitMap[Hex.toStr(hex)]) {
-              const fruit = fruitMap[Hex.toStr(hex)];
-              fill = getFillClass(fruit.color);
+            let scoreText = "";
+            const fruit: IFruit | undefined = fruitMap[Hex.toStr(hex)];
+            if (fruit) {
+              if (fruit.score > 0) {
+                scoreText = fruit.score.toString();
+              }
             }
 
             return (
-              <polygon
+              <g
+                transform={`translate(${translateX},${translateY})`}
                 key={Hex.toStr(hex)}
-                data-key={Hex.toStr(hex)}
-                points={points.join(" ")}
-                className={`${fill} slot`}
-                stroke="black"
-              />
+              >
+                <polygon
+                  data-key={Hex.toStr(hex)}
+                  points={points.join(" ")}
+                  className={`fill-transparent slot stroke-gray-300`}
+                />
+                {fruit && !scoreText && <Citrus color={fruit.color} />}
+                {fruit && scoreText && (
+                  <rect
+                    x={-12}
+                    y={-12}
+                    width={24}
+                    height={24}
+                    rx={4}
+                    className={`fill-transparent ${getStrokeClass(
+                      fruit.color
+                    )}`}
+                  />
+                )}
+                {fruit && (
+                  <text
+                    dominantBaseline="middle"
+                    textAnchor="middle"
+                    className={`${getFillClass(fruit.color)}`}
+                  >
+                    {scoreText}
+                  </text>
+                )}
+              </g>
             );
           })}
-        </svg>
-      </animated.div>
+        </animated.g>
+      </svg>
     </div>
   );
 };
