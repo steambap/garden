@@ -6,6 +6,7 @@ import { Hex, hexOrigin } from "./hex";
 import bgioContext from "./bgio_context";
 import hudContext from "./hud_context";
 import Citrus from "./citrus";
+import { InnerPolygon } from "./bevel";
 
 interface props {
   p: IPiece;
@@ -63,8 +64,9 @@ const HandPiece = ({ p }: props) => {
           <g key={idx} transform={`translate(${center.x},${center.y})`}>
             <polygon
               points={points.join(" ")}
-              className="fill-transparent stroke-gray-300"
+              className="stroke-gray-300"
             />
+            <InnerPolygon />
             <Citrus color={color} />
           </g>
         );

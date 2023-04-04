@@ -5,6 +5,7 @@ import bgioContext from "./bgio_context";
 import { getFruitMapping, getFillClass, getStrokeClass, IFruit } from "./piece";
 import { Hex, hexMap, hexOrigin } from "./hex";
 import Citrus from "./citrus";
+import { InnerPolygon } from "./bevel";
 
 const innerWidth = window.innerWidth;
 const innerHeight = window.innerHeight;
@@ -54,8 +55,9 @@ const Board = () => {
                 <polygon
                   data-key={Hex.toStr(hex)}
                   points={points.join(" ")}
-                  className={`fill-transparent slot stroke-gray-300`}
+                  className={`${!fruit && 'fill-transparent'} slot stroke-gray-300`}
                 />
+                {fruit && <InnerPolygon />}
                 {fruit && !scoreText && <Citrus color={fruit.color} />}
                 {fruit && scoreText && (
                   <rect

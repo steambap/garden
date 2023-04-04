@@ -4,6 +4,7 @@ import { IG, gameConfig } from "./config";
 import Board from "./board";
 import HUD from "./hud";
 import bgioContext from "./bgio_context";
+import { BevelFilter } from "./bevel";
 
 const createNewObject = () => ({});
 
@@ -67,6 +68,7 @@ function App() {
         <Board />
         <HUD />
       </bgioContext.Provider>
+      <BevelFilter />
     </div>
   );
 }
